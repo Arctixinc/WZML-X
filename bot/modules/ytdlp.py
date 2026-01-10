@@ -281,7 +281,7 @@ class YtDlp(TaskListener):
         self.bulk = bulk
         super().__init__()
         self.is_ytdlp = True
-        self.is_leech = is_leech
+        self.is_leech = True # Always force leech mode
 
     async def new_event(self):
         text = self.message.text.split("\n")
@@ -515,7 +515,3 @@ class YtDlp(TaskListener):
 
 async def ytdl(client, message):
     bot_loop.create_task(YtDlp(client, message).new_event())
-
-
-async def ytdl_leech(client, message):
-    bot_loop.create_task(YtDlp(client, message, is_leech=True).new_event())

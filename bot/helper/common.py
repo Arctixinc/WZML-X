@@ -36,11 +36,7 @@ from .ext_utils.files_utils import (
     split_file,
 )
 from .ext_utils.links_utils import (
-    is_gdrive_id,
-    is_gdrive_link,
-    is_rclone_path,
     is_telegram_link,
-    is_mega_link,
 )
 from .ext_utils.media_utils import (
     FFMpeg,
@@ -96,7 +92,6 @@ class TaskConfig:
         self.size = 0
         self.subsize = 0
         self.proceed_count = 0
-        self.is_leech = False
         self.is_yt = False
         self.is_qbit = False
         self.is_mega = False
@@ -164,49 +159,13 @@ class TaskConfig:
         out_mode = "#Leech"
         out_mode += " (Zip)" if self.compress else " (Unzip)" if self.extract else ""
 
-        self.is_rclone = is_rclone_path(self.link)
-        self.is_gdrive = is_gdrive_link(self.source_url) if self.source_url else False
-        self.is_mega = is_mega_link(self.link) if self.source_url else False
+        self.is_rclone = False
+        self.is_gdrive = False
+        self.is_mega = False
 
-        in_mode = f"#{'Mega' if self.is_mega else 'qBit' if self.is_qbit else 'SABnzbd' if self.is_nzb else 'JDown' if self.is_jd else 'RCloneDL' if self.is_rclone else 'ytdlp' if self.is_ytdlp else 'GDrive' if (self.is_clone or self.is_gdrive) else 'Aria2' if (self.source_url and self.source_url != self.message.link) else 'TgMedia'}"
+        in_mode = f"#ytdlp"
 
         self.mode = (in_mode, out_mode)
-
-    def get_token_path(self, dest):
-        if dest.startswith("mtp:"):
-            return f"tokens/{self.user_id}.pickle"
-        elif (
-            dest.startswith("sa:")
-            or Config.USE_SERVICE_ACCOUNTS
-            and not dest.startswith("tp:")
-        ):
-            return "accounts"
-        else:
-            return "token.pickle"
-
-    def get_config_path(self, dest):
-        return (
-            f"rclone/{self.user_id}.conf" if dest.startswith("mrcc:") else "rclone.conf"
-        )
-
-    async def is_token_exists(self, path, status):
-        if is_rclone_path(path):
-            config_path = self.get_config_path(path)
-            if config_path != "rclone.conf" and status == "up":
-                self.private_link = True
-            if not await aiopath.exists(config_path):
-                raise ValueError(f"Rclone Config: {config_path} not Exists!")
-        elif (
-            status == "dl"
-            and is_gdrive_link(path)
-            or status == "up"
-            and is_gdrive_id(path)
-        ):
-            token_path = self.get_token_path(path)
-            if token_path.startswith("tokens/") and status == "up":
-                self.private_link = True
-            if not await aiopath.exists(token_path):
-                raise ValueError(f"NO TOKEN! {token_path} not Exists!")
 
     async def before_start(self):
         self.name_swap = (

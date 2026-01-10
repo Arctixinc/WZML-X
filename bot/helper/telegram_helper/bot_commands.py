@@ -7,7 +7,7 @@ class BotCommands:
     LoginCommand = "login"
 
     _static_commands = {
-        "YtdlLeech": ["ytdlleech", "yl"],
+        "Ytdl": ["ytdl", "y"],
         "Users": "users",
         "CancelTask": ["cancel", "c"],
         "CancelAll": ["cancelall", "call"],

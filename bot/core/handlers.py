@@ -199,12 +199,11 @@ def add_handlers():
     )
     TgClient.bot.add_handler(
         MessageHandler(
-            ytdl_leech,
-            filters=command(BotCommands.YtdlLeechCommand, case_sensitive=True)
+            ytdl,
+            filters=command(BotCommands.YtdlCommand, case_sensitive=True)
             & CustomFilters.authorized,
         )
     )
-    # Re-added ForceStart handler which was missing but present in commands
     TgClient.bot.add_handler(
         MessageHandler(
             remove_from_queue,

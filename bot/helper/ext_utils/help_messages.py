@@ -1,13 +1,4 @@
 # ruff: noqa: F403, F405
-mirror = """<b>Send link along with command line or </b>
-
-/cmd link
-
-<b>By replying to link/file</b>:
-
-/cmd -n new name -e -up upload destination
-"""
-
 yt = """<b>Send link along with command line</b>:
 
 /cmd link
@@ -16,9 +7,6 @@ yt = """<b>Send link along with command line</b>:
 
 Check here all supported <a href='https://github.com/yt-dlp/yt-dlp/blob/master/supportedsites.md'>SITES</a>
 Check all yt-dlp api options from this <a href='https://github.com/yt-dlp/yt-dlp/blob/master/yt_dlp/YoutubeDL.py#L212'>FILE</a> or use this <a href='https://t.me/mltb_official_channel/177'>script</a> to convert cli arguments to api options."""
-
-clone = """Send Gdrive|Gdot|Filepress|Filebee|Appdrive|Gdflix link or rclone path along with command or by replying to the link/rc_path by command.
-Use -sync to use sync method in rclone. Example: /cmd rcl/rclone_path -up rcl/rclone_path/rc -sync"""
 
 new_name = """<b>New Name</b>: -n
 
@@ -62,14 +50,6 @@ Note: Only mb and gb are supported or write in bytes without unit!"""
 
 upload = """<b>Upload Destination</b>: -up
 
-/cmd link -up rcl/gdl (rcl: to select rclone config, remote & path | gdl: To select token.pickle, gdrive id) using buttons
-You can directly add the upload path: -up remote:dir/subdir or -up Gdrive_id or -up id/username (telegram) or -up id/username|topic_id (telegram)
-If DEFAULT_UPLOAD is `rc` then you can pass up: `gd` to upload using gdrive tools to GDRIVE_ID.
-If DEFAULT_UPLOAD is `gd` then you can pass up: `rc` to upload to RCLONE_PATH.
-
-If you want to add path or gdrive manually from your config/token (UPLOADED FROM USETTING) add mrcc: for rclone and mtp: before the path/gdrive_id without space.
-/cmd link -up mrcc:main:dump or -up mtp:gdrive_id <strong>or you can simply edit upload using owner/user token/config from usetting without adding mtp: or mrcc: before the upload path/id</strong>
-
 To add leech destination:
 -up id/@username/pm
 -up b:id/@username/pm (b: means leech by bot) (id or username of the chat or write pm means private message so bot will send the files in private to you)
@@ -77,20 +57,7 @@ when you should use b:(leech by bot)? When your default settings is leech by use
 -up u:id/@username(u: means leech by user) This incase OWNER added USER_STRING_SESSION.
 -up h:id/@username(hybrid leech) h: to upload files by bot and user based on file size.
 -up id/@username|topic_id(leech in specific chat and topic) add | without space and write topic id after chat id or username.
-
-In case you want to specify whether using token.pickle or service accounts you can add tp:gdrive_id (using token.pickle) or sa:gdrive_id (using service accounts) or mtp:gdrive_id (using token.pickle uploaded from usetting).
-DEFAULT_UPLOAD doesn't affect on leech cmds.
 """
-
-user_download = """<b>User Download</b>: link
-
-/cmd tp:link to download using owner token.pickle incase service account enabled.
-/cmd sa:link to download using service account incase service account disabled.
-/cmd tp:gdrive_id to download using token.pickle and file_id incase service account enabled.
-/cmd sa:gdrive_id to download using service account and file_id incase service account disabled.
-/cmd mtp:gdrive_id or mtp:link to download using user token.pickle uploaded from usetting
-/cmd mrcc:remote:path to download using user rclone config uploaded from usetting
-you can simply edit upload using owner/user token/config from usetting without adding mtp: or mrcc: before the path/id"""
 
 rcf = """<b>Rclone Flags</b>: -rcf
 
@@ -113,42 +80,12 @@ so you can't set different upload destinations along with link incase you have a
 You can set start and end of the links from the bulk like seed, with -b start:end or only end by -b :end or only start by -b start.
 The default start is from zero(first link) to inf."""
 
-rlone_dl = """<b>Rclone Download</b>:
-
-Treat rclone paths exactly like links
-/cmd main:dump/ubuntu.iso or rcl(To select config, remote and path)
-Users can add their own rclone from user settings
-If you want to add path manually from your config add mrcc: before the path without space
-/cmd mrcc:main:dump/ubuntu.iso
-You can simply edit using owner/user config from usetting without adding mrcc: before the path"""
-
 extract_zip = """<b>Extract/Zip</b>: -e -z
 
 /cmd link -e password (extract password protected)
 /cmd link -z password (zip password protected)
 /cmd link -z password -e (extract and zip password protected)
 Note: When both extract and zip added with cmd it will extract first and then zip, so always extract first"""
-
-join = """<b>Join Splitted Files</b>: -j
-
-This option will only work before extract and zip, so mostly it will be used with -m argument (samedir)
-By Reply:
-/cmd -i 3 -j -m folder name
-/cmd -b -j -m folder name
-if u have link(folder) have splitted files:
-/cmd link -j"""
-
-tg_links = """<b>TG Links</b>:
-
-Treat links like any direct link
-Some links need user access so you must add USER_SESSION_STRING for it.
-Three types of links:
-Public: https://t.me/channel_name/message_id
-Private: tg://openmessage?user_id=xxxxxx&message_id=xxxxx
-Super: https://t.me/c/channel_id/message_id
-Range: https://t.me/channel_name/first_message_id-last_message_id
-Range Example: tg://openmessage?user_id=xxxxxx&message_id=555-560 or https://t.me/channel_name/100-150
-Note: Range link will work only by replying cmd to it"""
 
 sample_video = """<b>Sample Video</b>: -sv
 
@@ -161,12 +98,6 @@ screenshot = """<b>ScreenShots</b>: -ss
 Create screenshots for one video or folder of videos.
 /cmd -ss (it will take the default values which is 10 photos).
 You can control this value. Example: /cmd -ss 6."""
-
-seed = """<b>Bittorrent seed</b>: -d
-
-/cmd link -d ratio:seed_time or by replying to file/link
-To specify ratio and seed time add -d ratio:time.
-Example: -d 0.7:10 (ratio and time) or -d 0.7 (only ratio) or -d :10 (only time) where time in minutes"""
 
 zip_arg = """<b>Zip</b>: -z password
 
@@ -195,21 +126,6 @@ force_start = """<b>Force Start</b>: -f -fd -fu
 /cmd link -f (force download and upload)
 /cmd link -fd (force download only)
 /cmd link -fu (force upload directly after download finish)"""
-
-gdrive = """<b>Gdrive</b>: link
-If DEFAULT_UPLOAD is `rc` then you can pass up: `gd` to upload using gdrive tools to GDRIVE_ID.
-/cmd gdriveLink or gdl or gdriveId -up gdl or gdriveId or gd
-/cmd tp:gdriveLink or tp:gdriveId -up tp:gdriveId or gdl or gd (to use token.pickle if service account enabled)
-/cmd sa:gdriveLink or sa:gdriveId -p sa:gdriveId or gdl or gd (to use service account if service account disabled)
-/cmd mtp:gdriveLink or mtp:gdriveId -up mtp:gdriveId or gdl or gd(if you have added upload gdriveId from usetting) (to use user token.pickle that uploaded by usetting)
-You can simply edit using owner/user token from usetting without adding mtp: before the id"""
-
-rclone_cl = """<b>Rclone</b>: path
-If DEFAULT_UPLOAD is `gd` then you can pass up: `rc` to upload to RCLONE_PATH.
-/cmd rcl/rclone_path -up rcl/rclone_path/rc -rcf flagkey:flagvalue|flagkey|flagkey:flagvalue
-/cmd rcl or rclone_path -up rclone_path or rc or rcl
-/cmd mrcc:rclone_path -up rcl or rc(if you have add rclone path from usetting) (to use user config)
-You can simply edit using owner/user config from usetting without adding mrcc: before the path"""
 
 name_swap = r"""<b>Name Substitution</b>: -ns
 /cmd link -ns script/code/s | mirror/leech | tea/ /s | clone | cpu/ | \[mltb\]/mltb | \\text\\/text/s
@@ -306,42 +222,8 @@ YT_HELP_DICT = {
     "Metadata": metadata,
 }
 
-MIRROR_HELP_DICT = {
-    "main": mirror,
-    "New-Name": new_name,
-    "DL-Auth": "<b>Direct link authorization</b>: -au -ap\n\n/cmd link -au username -ap password",
-    "Headers": "<b>Direct link custom headers</b>: -h\n\n/cmd link -h key: value key1: value1",
-    "Extract/Zip": extract_zip,
-    "Multi-Link": multi_link,
-    "Same-Directory": same_dir,
-    "Thumb": thumb,
-    "Split-Size": split_size,
-    "Upload-Destination": upload,
-    "Rclone-Flags": rcf,
-    "Bulk": bulk,
-    "Join": join,
-    "Rclone-DL": rlone_dl,
-    "Tg-Links": tg_links,
-    "Sample-Video": sample_video,
-    "Screenshot": screenshot,
-    "Convert-Media": convert_media,
-    "Force-Start": force_start,
-    "User-Download": user_download,
-    "Name-Swap": name_swap,
-    "TG-Transmission": transmission,
-    "Thumb-Layout": thumbnail_layout,
-    "Leech-Type": leech_as,
-    "FFmpeg-Cmds": ffmpeg_cmds,
-    "Metadata": metadata,
-}
-
-CLONE_HELP_DICT = {
-    "main": clone,
-    "Multi-Link": multi_link,
-    "Bulk": bulk,
-    "Gdrive": gdrive,
-    "Rclone": rclone_cl,
-}
+MIRROR_HELP_DICT = YT_HELP_DICT
+CLONE_HELP_DICT = {}
 
 RSS_HELP_MESSAGE = """
 Use this format to add feed url:
@@ -379,11 +261,9 @@ def get_bot_commands():
     from ...core.plugin_manager import get_plugin_manager
 
     static_commands = {
-        "YtdlLeech": "[link] Leech YouTube, m3u8, Social Media and yt-dlp supported urls",
+        "Ytdl": "[link] Download from YouTube, m3u8, Social Media and yt-dlp supported urls",
         "UserSet": "User personal settings",
         "ForceStart": "[gid/reply] Force start from queued task",
-        "Count": "[link] Count no. of files/folders in GDrive",
-        "List": "[query] Search any Text which is available in GDrive",
         "MediaInfo": "[reply/link] Get MediaInfo of the Target Media",
         "Ping": "Ping Bot to test Response Speed",
         "Status": "[id/me] Tasks Status of Bot",
@@ -432,16 +312,8 @@ def get_help_string():
 
         if key == "SpeedTest" and key in BOT_COMMANDS:
             help_lines.append(f"{cmd_str}: Check Bot Speed using Speedtest.com")
-        elif key == "YtdlLeech":
-            help_lines.append(f"{cmd_str}: Leech yt-dlp supported link.")
-        elif key == "Count":
-            help_lines.append(
-                f"{cmd_str} [drive_url]: Count file/folder of Google Drive."
-            )
-        elif key == "Delete":
-            help_lines.append(
-                f"{cmd_str} [drive_url]: Delete file/folder from Google Drive (Only Owner & Sudo)."
-            )
+        elif key == "Ytdl":
+            help_lines.append(f"{cmd_str}: Download yt-dlp supported link.")
         elif key == "UserSet":
             help_lines.append(f"{cmd_str} [query]: Users settings.")
         elif key == "BotSet":
@@ -452,8 +324,6 @@ def get_help_string():
             help_lines.append(f"{cmd_str} [gid]: Force start task by gid or reply.")
         elif key == "CancelAll":
             help_lines.append(f"{cmd_str} [query]: Cancel all [status] tasks.")
-        elif key == "List":
-            help_lines.append(f"{cmd_str} [query]: Search in Google Drive(s).")
         elif key == "MediaInfo":
             help_lines.append(f"{cmd_str} [query]: Get media info.")
         elif key == "Status":

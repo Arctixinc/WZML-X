@@ -81,7 +81,7 @@ class TaskListener(TaskConfig):
                 self.same_dir[self.folder_name]["total"] -= 1
 
     async def on_download_start(self):
-        mode_name = "Leech" if self.is_leech else "Mirror"
+        mode_name = "Leech"
         if self.bot_pm and self.is_super_chat:
             self.pm_msg = await send_message(
                 self.user_id,
@@ -244,7 +244,7 @@ class TaskListener(TaskConfig):
             self.size = await get_path_size(up_path)
             self.clear()
 
-        if self.is_leech and self.is_file:
+        if self.is_file:
             fname = ospath.basename(up_path)
             self.file_details["filename"] = fname
             self.file_details["mime_type"] = (guess_type(fname))[
@@ -300,7 +300,7 @@ class TaskListener(TaskConfig):
         self.name = up_path.replace(f"{up_dir}/", "").split("/", 1)[0]
         self.size = await get_path_size(up_dir)
 
-        if self.is_leech and not self.compress:
+        if not self.compress:
             await self.proceed_split(up_path, gid)
             if self.is_cancelled:
                 return
@@ -322,16 +322,15 @@ class TaskListener(TaskConfig):
         self.size = await get_path_size(up_dir)
 
         # Removed other upload logic, only telegram leech is supported
-        if self.is_leech:
-            LOGGER.info(f"Leech Name: {self.name}")
-            tg = TelegramUploader(self, up_dir)
-            async with task_dict_lock:
-                task_dict[self.mid] = TelegramStatus(self, tg, gid, "up")
-            await gather(
-                update_status_message(self.message.chat.id),
-                tg.upload(),
-            )
-            del tg
+        LOGGER.info(f"Leech Name: {self.name}")
+        tg = TelegramUploader(self, up_dir)
+        async with task_dict_lock:
+            task_dict[self.mid] = TelegramStatus(self, tg, gid, "up")
+        await gather(
+            update_status_message(self.message.chat.id),
+            tg.upload(),
+        )
+        del tg
         return
 
     async def on_upload_complete(
@@ -352,42 +351,42 @@ class TaskListener(TaskConfig):
         )
         LOGGER.info(f"Task Done: {self.name}")
 
-        if self.is_leech:
-            msg += f"\n<b>Total Files: </b>{folders}"
-            if mime_type != 0:
-                msg += f"\n┠ <b>Corrupted Files</b> → {mime_type}"
-            msg += f"\n┖ <b>Task By</b> → {self.tag}\n\n"
+        # Always assume leech mode
+        msg += f"\n<b>Total Files: </b>{folders}"
+        if mime_type != 0:
+            msg += f"\n┠ <b>Corrupted Files</b> → {mime_type}"
+        msg += f"\n┖ <b>Task By</b> → {self.tag}\n\n"
 
-            if self.bot_pm:
-                pmsg = msg
-                pmsg += "〶 <b><u>Action Performed :</u></b>\n"
-                pmsg += "⋗ <i>File(s) have been sent to User PM</i>\n\n"
-                if self.is_super_chat:
-                    await send_message(self.message, pmsg)
+        if self.bot_pm:
+            pmsg = msg
+            pmsg += "〶 <b><u>Action Performed :</u></b>\n"
+            pmsg += "⋗ <i>File(s) have been sent to User PM</i>\n\n"
+            if self.is_super_chat:
+                await send_message(self.message, pmsg)
 
-            if not files and not self.is_super_chat:
-                await send_message(self.message, msg)
-            else:
-                log_chat = self.user_id if self.bot_pm else self.message
-                msg += "〶 <b><u>Files List :</u></b>\n"
-                fmsg = ""
-                for index, (link, name) in enumerate(files.items(), start=1):
-                    chat_id, msg_id = link.split("/")[-2:]
-                    fmsg += f"{index}. <a href='{link}'>{name}</a>"
-                    if Config.MEDIA_STORE and (
-                        self.is_super_chat or Config.LEECH_DUMP_CHAT
-                    ):
-                        if chat_id.isdigit():
-                            chat_id = f"-100{chat_id}"
-                        flink = f"https://t.me/{TgClient.BNAME}?start={encode_slink('file' + chat_id + '&&' + msg_id)}"
-                        fmsg += f"\n┖ <b>Get Media</b> → <a href='{flink}'>Store Link</a> | <a href='https://t.me/share/url?url={flink}'>Share Link</a>"
-                    fmsg += "\n"
-                    if len(fmsg.encode() + msg.encode()) > 4000:
-                        await send_message(log_chat, msg + fmsg)
-                        await sleep(1)
-                        fmsg = ""
-                if fmsg != "":
+        if not files and not self.is_super_chat:
+            await send_message(self.message, msg)
+        else:
+            log_chat = self.user_id if self.bot_pm else self.message
+            msg += "〶 <b><u>Files List :</u></b>\n"
+            fmsg = ""
+            for index, (link, name) in enumerate(files.items(), start=1):
+                chat_id, msg_id = link.split("/")[-2:]
+                fmsg += f"{index}. <a href='{link}'>{name}</a>"
+                if Config.MEDIA_STORE and (
+                    self.is_super_chat or Config.LEECH_DUMP_CHAT
+                ):
+                    if chat_id.isdigit():
+                        chat_id = f"-100{chat_id}"
+                    flink = f"https://t.me/{TgClient.BNAME}?start={encode_slink('file' + chat_id + '&&' + msg_id)}"
+                    fmsg += f"\n┖ <b>Get Media</b> → <a href='{flink}'>Store Link</a> | <a href='https://t.me/share/url?url={flink}'>Share Link</a>"
+                fmsg += "\n"
+                if len(fmsg.encode() + msg.encode()) > 4000:
                     await send_message(log_chat, msg + fmsg)
+                    await sleep(1)
+                    fmsg = ""
+            if fmsg != "":
+                await send_message(log_chat, msg + fmsg)
 
         if self.seed:
             await clean_target(self.up_dir)
@@ -430,7 +429,7 @@ class TaskListener(TaskConfig):
 ┠ <b>Out Mode</b> → {self.mode[1]}
 {error}"""
             if is_limit
-            else f"""<i><b>〶 Download Stopped!</b></i>
+            else f"""<i><b>㶶 Download Stopped!</b></i>
 │
 ┟ <b>Due To</b> → {escape(str(error))}
 ┠ <b>Task Size</b> → {get_readable_file_size(self.size)}
