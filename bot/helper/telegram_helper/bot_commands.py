@@ -7,22 +7,7 @@ class BotCommands:
     LoginCommand = "login"
 
     _static_commands = {
-        "Mirror": ["mirror", "m"],
-        "QbMirror": ["qbmirror", "qm"],
-        "JdMirror": ["jdmirror", "jm"],
-        "Ytdl": ["ytdl", "y"],
-        "UpHoster": ["uphoster", "up"],
-        "NzbMirror": ["nzbmirror", "nm"],
-        "Leech": ["leech", "l"],
-        "QbLeech": ["qbleech", "ql"],
-        "JdLeech": ["jdleech", "jl"],
         "YtdlLeech": ["ytdlleech", "yl"],
-        "NzbLeech": ["nzbleech", "nl"],
-        "Clone": ["clone", "cl"],
-        "Count": "count",
-        "Delete": "del",
-        "List": "list",
-        "Search": "search",
         "Users": "users",
         "CancelTask": ["cancel", "c"],
         "CancelAll": ["cancelall", "call"],
@@ -41,15 +26,12 @@ class BotCommands:
         "Exec": "exec",
         "ClearLocals": "clearlocals",
         "IMDB": "imdb",
-        "Rss": "rss",
         "Authorize": ["authorize", "a"],
         "UnAuthorize": ["unauthorize", "ua"],
         "AddSudo": ["addsudo", "as"],
         "RmSudo": ["rmsudo", "rs"],
         "BotSet": ["bsetting", "bs"],
         "UserSet": ["usetting", "us"],
-        "Select": ["select", "sel"],
-        "NzbSearch": ["nzbsearch", "ns"],
         "Plugins": "plugins",
     }
 

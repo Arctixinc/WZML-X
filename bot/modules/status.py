@@ -10,11 +10,8 @@ from .. import (
     task_dict,
     bot_start_time,
     intervals,
-    sabnzbd_client,
     DOWNLOAD_DIR,
 )
-from ..core.torrent_manager import TorrentManager
-from ..core.jdownloader_booter import jdownloader
 from ..helper.ext_utils.bot_utils import new_task
 from ..helper.ext_utils.status_utils import (
     EngineStatus,
@@ -133,32 +130,6 @@ async def status_pages(_, query):
                 *(get_download_status(download) for download in task_dict.values())
             )
 
-        eng_status = EngineStatus()
-        if any(
-            eng in (eng_status.STATUS_ARIA2, eng_status.STATUS_QBIT)
-            for _, __, eng in status_results
-        ):
-            dl_speed, seed_speed = await TorrentManager.overall_speed()
-
-        if any(eng == eng_status.STATUS_SABNZBD for _, __, eng in status_results):
-            if sabnzbd_client.LOGGED_IN:
-                dl_speed += (
-                    int(
-                        float(
-                            (await sabnzbd_client.get_downloads())["queue"].get(
-                                "kbpersec", "0"
-                            )
-                        )
-                    )
-                    * 1024
-                )
-
-        if any(eng == eng_status.STATUS_JD for _, __, eng in status_results):
-            if jdownloader.is_connected:
-                dl_speed += (
-                    await jdownloader.device.downloadcontroller.get_speed_in_bytes()
-                )
-
         for status, speed, _ in status_results:
             match status:
                 case MirrorStatus.STATUS_DOWNLOAD:
@@ -198,16 +169,15 @@ async def status_pages(_, query):
         msg = f"""㊂ <b>Tasks Overview</b> :
         
 ┎ <b>Download:</b> {tasks["Download"]} | <b>Upload:</b> {tasks["Upload"]}
-┠ <b>Seed:</b> {tasks["Seed"]} | <b>Archive:</b> {tasks["Archive"]}
-┠ <b>Extract:</b> {tasks["Extract"]} | <b>Split:</b> {tasks["Split"]}
-┠ <b>QueueDL:</b> {tasks["QueueDl"]} | <b>QueueUP:</b> {tasks["QueueUp"]}
-┠ <b>Clone:</b> {tasks["Clone"]} | <b>CheckUp:</b> {tasks["CheckUp"]}
-┠ <b>Paused:</b> {tasks["Pause"]} | <b>SamVideo:</b> {tasks["SamVid"]}
-┞ <b>Convert:</b> {tasks["ConvertMedia"]} | <b>FFmpeg:</b> {tasks["FFmpeg"]}
+┠ <b>Archive:</b> {tasks["Archive"]} | <b>Extract:</b> {tasks["Extract"]}
+┠ <b>Split:</b> {tasks["Split"]} | <b>QueueDL:</b> {tasks["QueueDl"]}
+┠ <b>QueueUP:</b> {tasks["QueueUp"]} | <b>Clone:</b> {tasks["Clone"]}
+┠ <b>CheckUp:</b> {tasks["CheckUp"]} | <b>Paused:</b> {tasks["Pause"]}
+┠ <b>SamVideo:</b> {tasks["SamVid"]} | <b>Convert:</b> {tasks["ConvertMedia"]}
+┖ <b>FFmpeg:</b> {tasks["FFmpeg"]}
 │
 ┟ <b>Total Download Speed:</b> {get_readable_file_size(dl_speed)}/s
-┠ <b>Total Upload Speed:</b> {get_readable_file_size(up_speed)}/s
-┖ <b>Total Seeding Speed:</b> {get_readable_file_size(seed_speed)}/s
+┖ <b>Total Upload Speed:</b> {get_readable_file_size(up_speed)}/s
 """
         button = ButtonMaker()
         button.data_button("Back", f"status {data[1]} ref")

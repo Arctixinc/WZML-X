@@ -1,7 +1,6 @@
 from aioshutil import rmtree as aiormtree, move
 from asyncio import create_subprocess_exec, sleep, wait_for
 from asyncio.subprocess import PIPE
-from contextlib import suppress
 from psutil import disk_usage
 from os import path as ospath, readlink, walk
 from re import I, escape, search as re_search, split as re_split
@@ -18,7 +17,6 @@ from aiofiles.os import (
 from magic import Magic
 
 from ... import DOWNLOAD_DIR, LOGGER
-from ...core.torrent_manager import TorrentManager
 from .bot_utils import cmd_exec, sync_to_async
 from .exceptions import NotSupportedExtractionArchive
 
@@ -131,7 +129,6 @@ async def clean_download(opath):
 
 
 async def clean_all():
-    await TorrentManager.remove_all()
     LOGGER.info("Cleaning Download Directory")
     await (await create_subprocess_exec("rm", "-rf", DOWNLOAD_DIR)).wait()
     await aiomakedirs(DOWNLOAD_DIR, exist_ok=True)
@@ -237,8 +234,6 @@ async def move_and_merge(source, destination, mid):
             else:
                 await move(src_path, dest_path)
         else:
-            if item.endswith((".aria2", ".!qB")):
-                continue
             if await aiopath.exists(dest_path):
                 dest_path = f"{destination}/{mid}-{item}"
             await move(src_path, dest_path)

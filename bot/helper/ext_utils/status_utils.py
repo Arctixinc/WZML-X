@@ -41,22 +41,12 @@ class MirrorStatus:
 class EngineStatus:
     def __init__(self):
         ver = bot_cache.get("eng_versions", {})
-        self.STATUS_ARIA2 = f"Aria2 v{ver.get('aria2', 'N/A')}"
-        self.STATUS_AIOHTTP = f"AioHttp v{ver.get('aiohttp', 'N/A')}"
-        self.STATUS_GDAPI = f"Google-API v{ver.get('gapi', 'N/A')}"
-        self.STATUS_QBIT = f"qBit v{ver.get('qBittorrent', 'N/A')}"
         self.STATUS_TGRAM = f"Pyro v{ver.get('pyrotgfork', 'N/A')}"
-        self.STATUS_MEGA = f"MegaCMD v{ver.get('mega', 'N/A')}"
         self.STATUS_YTDLP = f"yt-dlp v{ver.get('yt-dlp', 'N/A')}"
         self.STATUS_FFMPEG = f"ffmpeg v{ver.get('ffmpeg', 'N/A')}"
         self.STATUS_7Z = f"7z v{ver.get('7z', 'N/A')}"
-        self.STATUS_RCLONE = f"RClone v{ver.get('rclone', 'N/A')}"
-        self.STATUS_SABNZBD = f"SABnzbd+ v{ver.get('SABnzbd+', 'N/A')}"
         self.STATUS_QUEUE = "QSystem v2"
-        self.STATUS_JD = "JDownloader v2"
-        self.STATUS_YT = "Youtube-Api"
         self.STATUS_METADATA = "Metadata"
-        self.STATUS_UPHOSTER = "Uphoster"
 
 
 STATUSES = {
@@ -256,20 +246,6 @@ async def get_readable_message(sid, is_user, page_no=1, status="All", page_step=
             msg += f"\n┠ <b>Status</b> → <b>{tstatus}</b>"
             msg += f"\n┠ <b>Speed</b> → <i>{task.speed()}</i>"
             msg += f"\n┠ <b>Time</b> → <i>{task.eta()} of {get_readable_time(elapsed + get_raw_time(task.eta()))} ( {get_readable_time(elapsed)} )</i>"
-            if tstatus == MirrorStatus.STATUS_DOWNLOAD and (
-                task.listener.is_torrent or task.listener.is_qbit
-            ):
-                try:
-                    msg += f"\n┠ <b>Seeders</b> → {task.seeders_num()} | <b>Leechers</b> → {task.leechers_num()}"
-                except Exception:
-                    pass
-            # TODO: Add Connected Peers
-        elif tstatus == MirrorStatus.STATUS_SEED:
-            msg += f"\n┠ <b>Size</b> → <i>{task.size()}</i> | <b>Uploaded</b>  → <i>{task.uploaded_bytes()}</i>"
-            msg += f"\n┠ <b>Status</b> → <b>{tstatus}</b>"
-            msg += f"\n┠ <b>Speed</b> → <i>{task.seed_speed()}</i>"
-            msg += f"\n┠ <b>Ratio</b> → <i>{task.ratio()}</i>"
-            msg += f"\n┠ <b>Time</b> → <i>{task.seeding_time()}</i> | <b>Elapsed</b> → <i>{get_readable_time(elapsed)}</i>"
         else:
             msg += f"\n┠ <b>Size</b> → <i>{task.size()}</i>"
         msg += f"\n┠ <b>Engine</b> → <i>{task.engine}</i>"

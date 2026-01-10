@@ -4,7 +4,6 @@ from uvloop import install
 
 install()
 
-from subprocess import run as srun
 from os import getcwd
 from asyncio import Lock, new_event_loop, set_event_loop
 from logging import (
@@ -20,9 +19,6 @@ from os import cpu_count
 from time import time
 
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-
-from .core.config_manager import BinConfig
-from sabnzbdapi import SabnzbdClient
 
 getLogger("requests").setLevel(WARNING)
 getLogger("urllib3").setLevel(WARNING)
@@ -53,14 +49,8 @@ cores = ",".join(str(i) for i in range(threads))
 
 bot_cache = {}
 DOWNLOAD_DIR = "/usr/src/app/downloads/"
-intervals = {"status": {}, "qb": "", "jd": "", "nzb": "", "stopAll": False}
-qb_torrents = {}
-jd_downloads = {}
-nzb_jobs = {}
+intervals = {"status": {}, "stopAll": False}
 user_data = {}
-aria2_options = {}
-qbit_options = {}
-nzb_options = {}
 queued_dl = {}
 queued_up = {}
 status_dict = {}
@@ -79,7 +69,7 @@ var_list = [
     "UPDATE_PKGS",
 ]
 auth_chats = {}
-excluded_extensions = ["aria2", "!qB"]
+excluded_extensions = []
 drives_names = []
 drives_ids = []
 index_urls = []
@@ -89,17 +79,7 @@ non_queued_up = set()
 multi_tags = set()
 task_dict_lock = Lock()
 queue_dict_lock = Lock()
-qb_listener_lock = Lock()
-nzb_listener_lock = Lock()
-jd_listener_lock = Lock()
 cpu_eater_lock = Lock()
 same_directory_lock = Lock()
-
-sabnzbd_client = SabnzbdClient(
-    host="http://localhost",
-    api_key="admin",
-    port="8070",
-)
-srun([BinConfig.QBIT_NAME, "-d", f"--profile={getcwd()}"], check=False)
 
 scheduler = AsyncIOScheduler(event_loop=bot_loop)

@@ -6,9 +6,7 @@ mirror = """<b>Send link along with command line or </b>
 <b>By replying to link/file</b>:
 
 /cmd -n new name -e -up upload destination
-
-<b>NOTE:</b>
-1. Commands that start with <b>qb</b> are ONLY for torrents."""
+"""
 
 yt = """<b>Send link along with command line</b>:
 
@@ -25,7 +23,7 @@ Use -sync to use sync method in rclone. Example: /cmd rcl/rclone_path -up rcl/rc
 new_name = """<b>New Name</b>: -n
 
 /cmd link -n new name
-Note: Doesn't work with torrents"""
+"""
 
 multi_link = """<b>Multi links only by replying to first link/file</b>: -i
 
@@ -314,8 +312,6 @@ MIRROR_HELP_DICT = {
     "DL-Auth": "<b>Direct link authorization</b>: -au -ap\n\n/cmd link -au username -ap password",
     "Headers": "<b>Direct link custom headers</b>: -h\n\n/cmd link -h key: value key1: value1",
     "Extract/Zip": extract_zip,
-    "Select-Files": "<b>Bittorrent/JDownloader/Sabnzbd File Selection</b>: -s\n\n/cmd link -s or by replying to file/link",
-    "Torrent-Seed": seed,
     "Multi-Link": multi_link,
     "Same-Directory": same_dir,
     "Thumb": thumb,
@@ -383,25 +379,15 @@ def get_bot_commands():
     from ...core.plugin_manager import get_plugin_manager
 
     static_commands = {
-        "Mirror": "[link/file] Mirror to Upload Destination",
-        "QbMirror": "[magnet/torrent] Mirror to Upload Destination using qbit",
-        "Ytdl": "[link] Mirror YouTube, m3u8, Social Media and yt-dlp supported urls",
-        "UpHoster": "[link/file] Upload to DDL Servers",
-        "Leech": "[link/file] Leech files to Upload to Telegram",
-        "QbLeech": "[magnet/torrent] Leech files to Upload to Telegram using qbit",
         "YtdlLeech": "[link] Leech YouTube, m3u8, Social Media and yt-dlp supported urls",
-        "Clone": "[link] Clone files/folders to GDrive",
         "UserSet": "User personal settings",
         "ForceStart": "[gid/reply] Force start from queued task",
         "Count": "[link] Count no. of files/folders in GDrive",
         "List": "[query] Search any Text which is available in GDrive",
-        "Search": "[query] Search torrents via Qbit Plugins",
         "MediaInfo": "[reply/link] Get MediaInfo of the Target Media",
-        "Select": "[gid/reply] Select files for NZB, Aria2, Qbit Tasks",
         "Ping": "Ping Bot to test Response Speed",
         "Status": "[id/me] Tasks Status of Bot",
         "Stats": "Bot, OS, Repo & System full Statistics",
-        "Rss": "User RSS Management Settings",
         "IMDB": "[query] or ttxxxxxx Get IMDB info",
         "CancelAll": "Cancel all Tasks on the Bot",
         "Help": "Detailed help usage of the WZ Bot",
@@ -446,32 +432,8 @@ def get_help_string():
 
         if key == "SpeedTest" and key in BOT_COMMANDS:
             help_lines.append(f"{cmd_str}: Check Bot Speed using Speedtest.com")
-        elif key == "Mirror":
-            help_lines.append(f"{cmd_str}: Start mirroring to cloud.")
-        elif key == "QbMirror":
-            help_lines.append(f"{cmd_str}: Start Mirroring to cloud using qBittorrent.")
-        elif key == "JdMirror":
-            help_lines.append(f"{cmd_str}: Start Mirroring to cloud using JDownloader.")
-        elif key == "NzbMirror":
-            help_lines.append(f"{cmd_str}: Start Mirroring to cloud using Sabnzbd.")
-        elif key == "Ytdl":
-            help_lines.append(f"{cmd_str}: Mirror yt-dlp supported link.")
-        elif key == "UpHoster":
-            help_lines.append(f"{cmd_str}: Upload to DDL Servers.")
-        elif key == "Leech":
-            help_lines.append(f"{cmd_str}: Start leeching to Telegram.")
-        elif key == "QbLeech":
-            help_lines.append(f"{cmd_str}: Start leeching using qBittorrent.")
-        elif key == "JdLeech":
-            help_lines.append(f"{cmd_str}: Start leeching using JDownloader.")
-        elif key == "NzbLeech":
-            help_lines.append(f"{cmd_str}: Start leeching using Sabnzbd.")
         elif key == "YtdlLeech":
             help_lines.append(f"{cmd_str}: Leech yt-dlp supported link.")
-        elif key == "Clone":
-            help_lines.append(
-                f"{cmd_str} [drive_url]: Copy file/folder to Google Drive."
-            )
         elif key == "Count":
             help_lines.append(
                 f"{cmd_str} [drive_url]: Count file/folder of Google Drive."
@@ -484,10 +446,6 @@ def get_help_string():
             help_lines.append(f"{cmd_str} [query]: Users settings.")
         elif key == "BotSet":
             help_lines.append(f"{cmd_str} [query]: Bot settings.")
-        elif key == "Select":
-            help_lines.append(
-                f"{cmd_str}: Select files from torrents or nzb by gid or reply."
-            )
         elif key == "CancelTask":
             help_lines.append(f"{cmd_str} [gid]: Cancel task by gid or reply.")
         elif key == "ForceStart":
@@ -496,8 +454,6 @@ def get_help_string():
             help_lines.append(f"{cmd_str} [query]: Cancel all [status] tasks.")
         elif key == "List":
             help_lines.append(f"{cmd_str} [query]: Search in Google Drive(s).")
-        elif key == "Search":
-            help_lines.append(f"{cmd_str} [query]: Search for torrents with API.")
         elif key == "MediaInfo":
             help_lines.append(f"{cmd_str} [query]: Get media info.")
         elif key == "Status":
@@ -542,8 +498,6 @@ def get_help_string():
             help_lines.append(
                 f"/{BotCommands.ClearLocalsCommand}: Clear {BotCommands.AExecCommand} or {BotCommands.ExecCommand} locals (Only Owner)."
             )
-        elif key == "Rss":
-            help_lines.append(f"/{BotCommands.RssCommand}: RSS Menu.")
 
     return "\n".join(help_lines)
 

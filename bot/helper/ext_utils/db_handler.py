@@ -6,7 +6,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 from pymongo.errors import PyMongoError
 from pymongo.server_api import ServerApi
 
-from ... import LOGGER, qbit_options, rss_dict, user_data
+from ... import LOGGER, user_data
 from ...core.config_manager import Config
 from ...core.tg_client import TgClient
 
@@ -58,27 +58,6 @@ class DbManager:
             {"_id": TgClient.ID}, {"$set": dict_}, upsert=True
         )
 
-    async def update_aria2(self, key, value):
-        if self._return:
-            return
-        await self.db.settings.aria2c.update_one(
-            {"_id": TgClient.ID}, {"$set": {key: value}}, upsert=True
-        )
-
-    async def update_qbittorrent(self, key, value):
-        if self._return:
-            return
-        await self.db.settings.qbittorrent.update_one(
-            {"_id": TgClient.ID}, {"$set": {key: value}}, upsert=True
-        )
-
-    async def save_qbit_settings(self):
-        if self._return:
-            return
-        await self.db.settings.qbittorrent.update_one(
-            {"_id": TgClient.ID}, {"$set": qbit_options}, upsert=True
-        )
-
     async def update_private_file(self, path):
         if self._return:
             return
@@ -95,15 +74,6 @@ class DbManager:
             await self.db.settings.files.update_one(
                 {"_id": TgClient.ID}, {"$unset": {db_path: ""}}, upsert=True
             )
-
-    async def update_nzb_config(self):
-        if self._return:
-            return
-        async with aiopen("sabnzbd/SABnzbd.ini", "rb+") as pf:
-            nzb_conf = await pf.read()
-        await self.db.settings.nzb.replace_one(
-            {"_id": TgClient.ID}, {"SABnzbd__ini": nzb_conf}, upsert=True
-        )
 
     async def update_user_data(self, user_id):
         if self._return:
@@ -159,26 +129,6 @@ class DbManager:
             await self.db.users[TgClient.ID].update_one(
                 {"_id": user_id}, {"$unset": {key: ""}}, upsert=True
             )
-
-    async def rss_update_all(self):
-        if self._return:
-            return
-        for user_id in list(rss_dict.keys()):
-            await self.db.rss[TgClient.ID].replace_one(
-                {"_id": user_id}, rss_dict[user_id], upsert=True
-            )
-
-    async def rss_update(self, user_id):
-        if self._return:
-            return
-        await self.db.rss[TgClient.ID].replace_one(
-            {"_id": user_id}, rss_dict[user_id], upsert=True
-        )
-
-    async def rss_delete(self, user_id):
-        if self._return:
-            return
-        await self.db.rss[TgClient.ID].delete_one({"_id": user_id})
 
     async def add_incomplete_task(self, cid, link, tag):
         if self._return:

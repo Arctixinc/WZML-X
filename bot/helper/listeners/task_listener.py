@@ -25,7 +25,6 @@ from ...modules.metadata import apply_metadata_title
 from ..common import TaskConfig
 from ...core.tg_client import TgClient
 from ...core.config_manager import Config
-from ...core.torrent_manager import TorrentManager
 from ..ext_utils.bot_utils import sync_to_async
 from ..ext_utils.links_utils import encode_slink
 from ..ext_utils.db_handler import database
@@ -38,29 +37,11 @@ from ..ext_utils.files_utils import (
     remove_excluded_files,
     move_and_merge,
 )
-from ..ext_utils.links_utils import is_gdrive_id
 from ..ext_utils.status_utils import get_readable_file_size, get_readable_time
 from ..ext_utils.task_manager import check_running_tasks, start_from_queued
-from ..mirror_leech_utils.uphoster_utils.gofile_utils.upload import GoFileUpload
-from ..mirror_leech_utils.uphoster_utils.buzzheavier_utils.upload import (
-    BuzzHeavierUpload,
-)
-from ..mirror_leech_utils.uphoster_utils.pixeldrain_utils.upload import (
-    PixelDrainUpload,
-)
-from ..mirror_leech_utils.uphoster_utils.multi_upload import MultiUphosterUpload
-from ..mirror_leech_utils.gdrive_utils.upload import GoogleDriveUpload
-from ..mirror_leech_utils.rclone_utils.transfer import RcloneTransferHelper
-from ..mirror_leech_utils.status_utils.uphoster_status import UphosterStatus
-from ..mirror_leech_utils.status_utils.gdrive_status import (
-    GoogleDriveStatus,
-)
 from ..mirror_leech_utils.status_utils.queue_status import QueueStatus
-from ..mirror_leech_utils.status_utils.rclone_status import RcloneStatus
 from ..mirror_leech_utils.status_utils.telegram_status import TelegramStatus
-from ..mirror_leech_utils.status_utils.yt_status import YtStatus
 from ..mirror_leech_utils.upload_utils.telegram_uploader import TelegramUploader
-from ..mirror_leech_utils.youtube_utils.youtube_upload import YouTubeUpload
 from ..telegram_helper.button_build import ButtonMaker
 from ..telegram_helper.message_utils import (
     delete_message,
@@ -80,7 +61,7 @@ class TaskListener(TaskConfig):
                 for intvl in list(st.values()):
                     intvl.cancel()
             intervals["status"].clear()
-            await gather(TorrentManager.aria2.purgeDownloadResult(), delete_status())
+            await delete_status()
 
     def clear(self):
         self.subname = ""
@@ -340,17 +321,8 @@ class TaskListener(TaskConfig):
 
         self.size = await get_path_size(up_dir)
 
-        if self.is_yt:
-            LOGGER.info(f"Up to yt Name: {self.name}")
-            yt = YouTubeUpload(self, up_path)
-            async with task_dict_lock:
-                task_dict[self.mid] = YtStatus(self, yt, gid, "up")
-            await gather(
-                update_status_message(self.message.chat.id),
-                sync_to_async(yt.upload),
-            )
-            del yt
-        elif self.is_leech:
+        # Removed other upload logic, only telegram leech is supported
+        if self.is_leech:
             LOGGER.info(f"Leech Name: {self.name}")
             tg = TelegramUploader(self, up_dir)
             async with task_dict_lock:
@@ -360,38 +332,6 @@ class TaskListener(TaskConfig):
                 tg.upload(),
             )
             del tg
-        elif self.is_uphoster:
-            LOGGER.info(f"Uphoster Upload Name: {self.name}")
-            uphoster_service = self.user_dict.get("UPHOSTER_SERVICE", "gofile")
-            services = uphoster_service.split(",")
-            ddl = MultiUphosterUpload(self, up_path, services)
-            async with task_dict_lock:
-                task_dict[self.mid] = UphosterStatus(self, ddl, gid, "up")
-            await gather(
-                update_status_message(self.message.chat.id),
-                ddl.upload(),
-            )
-            del ddl
-        elif is_gdrive_id(self.up_dest):
-            LOGGER.info(f"Gdrive Upload Name: {self.name}")
-            drive = GoogleDriveUpload(self, up_path)
-            async with task_dict_lock:
-                task_dict[self.mid] = GoogleDriveStatus(self, drive, gid, "up")
-            await gather(
-                update_status_message(self.message.chat.id),
-                sync_to_async(drive.upload),
-            )
-            del drive
-        else:
-            LOGGER.info(f"Rclone Upload Name: {self.name}")
-            RCTransfer = RcloneTransferHelper(self)
-            async with task_dict_lock:
-                task_dict[self.mid] = RcloneStatus(self, RCTransfer, gid, "up")
-            await gather(
-                update_status_message(self.message.chat.id),
-                RCTransfer.upload(up_path),
-            )
-            del RCTransfer
         return
 
     async def on_upload_complete(
@@ -411,32 +351,8 @@ class TaskListener(TaskConfig):
             f"\n┠ <b>Out Mode</b> → {self.mode[1]}"
         )
         LOGGER.info(f"Task Done: {self.name}")
-        if self.is_yt:
-            buttons = ButtonMaker()
-            if mime_type == "Folder/Playlist":
-                msg += "\n┠ <b>Type</b> → Playlist"
-                msg += f"\n┖ <b>Total Videos</b> → {files}"
-                if link:
-                    buttons.url_button("🔗 View Playlist", link)
-                user_message = f"{self.tag}\nYour playlist ({files} videos) has been uploaded to YouTube successfully!"
-            else:
-                msg += "\n┖ <b>Type</b> → Video"
-                if link:
-                    buttons.url_button("🔗 View Video", link)
-                user_message = (
-                    f"{self.tag}\nYour video has been uploaded to YouTube successfully!"
-                )
 
-            msg += f"\n\n<b>Task By: </b>{self.tag}"
-
-            button = buttons.build_menu(1) if link else None
-
-            await send_message(self.user_id, msg, button)
-            if Config.LEECH_DUMP_CHAT:
-                await send_message(int(Config.LEECH_DUMP_CHAT), msg, button)
-            await send_message(self.message, user_message, button)
-
-        elif self.is_leech:
+        if self.is_leech:
             msg += f"\n<b>Total Files: </b>{folders}"
             if mime_type != 0:
                 msg += f"\n┠ <b>Corrupted Files</b> → {mime_type}"
@@ -472,85 +388,7 @@ class TaskListener(TaskConfig):
                         fmsg = ""
                 if fmsg != "":
                     await send_message(log_chat, msg + fmsg)
-        else:
-            msg += f"\n│\n┟ <b>Type</b> → {mime_type}"
-            if mime_type == "Folder":
-                msg += f"\n┠ <b>SubFolders</b> → {folders}"
-                msg += f"\n┠ <b>Files</b> → {files}"
 
-            multi_link_msg = ""
-            multi_links = []
-            if isinstance(link, dict) and not self.is_yt:
-                # MultiUphoster result
-                for service, result in link.items():
-                    if "error" in result:
-                        multi_link_msg += (
-                            f"{service.capitalize()}: Error - {result['error']}\n"
-                        )
-                    elif result.get("link"):
-                        multi_links.append(
-                            (f"{service.capitalize()} Link", result["link"])
-                        )
-                multi_link_msg = multi_link_msg.strip()
-                link = None  # Disable single link button logic
-
-            if (
-                link
-                or rclone_path
-                and Config.RCLONE_SERVE_URL
-                and not self.private_link
-                or multi_links
-            ):
-                buttons = ButtonMaker()
-                if link and Config.SHOW_CLOUD_LINK:
-                    buttons.url_button("☁️ Cloud Link", link)
-                elif multi_links:
-                    for name, url in multi_links:
-                        buttons.url_button(name, url)
-                else:
-                    msg += f"\n\nPath: <code>{rclone_path}</code>"
-                if rclone_path and Config.RCLONE_SERVE_URL and not self.private_link:
-                    remote, rpath = rclone_path.split(":", 1)
-                    url_path = rutils.quote(f"{rpath}")
-                    share_url = f"{Config.RCLONE_SERVE_URL}/{remote}/{url_path}"
-                    if mime_type == "Folder":
-                        share_url += "/"
-                    buttons.url_button("🔗 Rclone Link", share_url)
-                if not rclone_path and dir_id:
-                    INDEX_URL = ""
-                    if self.private_link:
-                        INDEX_URL = self.user_dict.get("INDEX_URL", "") or ""
-                    elif Config.INDEX_URL:
-                        INDEX_URL = Config.INDEX_URL
-                    if INDEX_URL and self.name:
-                        safe_name = rutils.quote(self.name.strip("/"))
-                        share_url = f"{INDEX_URL}/{safe_name}"
-                        buttons.url_button("⚡ Index Link", share_url)
-                        if mime_type.startswith(("image", "video", "audio")):
-                            share_urls = f"{share_url}?a=view"
-                            buttons.url_button("🌐 View Link", share_urls)
-                button = buttons.build_menu(2)
-            else:
-                if not multi_link_msg:
-                    msg += f"\n┃\n┠ Path: <code>{rclone_path}</code>"
-                button = None
-            msg += f"\n┃\n┖ <b>Task By</b> → {self.tag}\n\n"
-            group_msg = (
-                msg + "〶 <b><u>Action Performed :</u></b>\n"
-                "⋗ <i>Cloud link(s) have been sent to User PM</i>\n\n"
-            )
-
-            if multi_link_msg:
-                group_msg += multi_link_msg + "\n"
-                msg += multi_link_msg + "\n"
-
-            if self.bot_pm and self.is_super_chat:
-                await send_message(self.user_id, msg, button)
-
-            if hasattr(Config, "MIRROR_LOG_ID") and Config.MIRROR_LOG_ID:
-                await send_message(Config.MIRROR_LOG_ID, msg, button)
-
-            await send_message(self.message, group_msg, button)
         if self.seed:
             await clean_target(self.up_dir)
             async with queue_dict_lock:
