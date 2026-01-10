@@ -262,7 +262,6 @@ class YtDlp(TaskListener):
         self,
         client,
         message,
-        is_leech=False,
         same_dir=None,
         bulk=None,
         multi_tag=None,
@@ -281,7 +280,6 @@ class YtDlp(TaskListener):
         self.bulk = bulk
         super().__init__()
         self.is_ytdlp = True
-        self.is_leech = True # Always force leech mode
 
     async def new_event(self):
         text = self.message.text.split("\n")

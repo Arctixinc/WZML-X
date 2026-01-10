@@ -166,7 +166,7 @@ async def limit_checker(listener, yt_playlist=0):
 
     if not limit_exceeded:
         extra_limits = [
-            (listener.is_leech, "LEECH_LIMIT", "Leech"),
+            (True, "LEECH_LIMIT", "Leech"),
             (listener.compress, "ARCHIVE_LIMIT", "Archive"),
             (listener.extract, "EXTRACT_LIMIT", "Extract"),
         ]
