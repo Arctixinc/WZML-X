@@ -44,7 +44,7 @@ threads = max(1, cpu_no // 2)
 cores = ",".join(str(i) for i in range(threads))
 
 bot_cache = {}
-DOWNLOAD_DIR = "/downloads/"
+DOWNLOAD_DIR = "/usr/src/app/downloads/"
 intervals = {"status": {}, "stopAll": False}
 user_data = {}
 queued_dl = {}

@@ -37,9 +37,9 @@ class TgClient:
         kwargs["api_hash"] = Config.TELEGRAM_HASH
         kwargs["proxy"] = Config.TG_PROXY
         kwargs["parse_mode"] = enums.ParseMode.HTML
-
+        kwargs["in_memory"] = True
         # ✅ STORE SESSION FILES
-        kwargs["workdir"] = SESSION_DIR
+        # kwargs["workdir"] = SESSION_DIR
 
         for param, value in {
             "max_concurrent_transmissions": 100,
@@ -97,6 +97,7 @@ class TgClient:
         cls.bot = cls.wztgClient(
             f"WZ-Bot{cls.ID}",
             bot_token=Config.BOT_TOKEN,
+            workdir="/usr/src/app",
         )
 
         await cls.bot.start()
