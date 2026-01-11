@@ -3,6 +3,7 @@ from asyncio import create_subprocess_exec, sleep, wait_for
 from asyncio.subprocess import PIPE
 from psutil import disk_usage
 from os import path as ospath, readlink, walk
+
 from re import I, escape, search as re_search, split as re_split
 
 from aiofiles.os import (
@@ -15,6 +16,10 @@ from aiofiles.os import (
     readlink as aioreadlink,
 )
 from magic import Magic
+
+import shutil
+from asyncio import to_thread
+
 
 from ... import DOWNLOAD_DIR, LOGGER
 from .bot_utils import cmd_exec, sync_to_async
@@ -130,8 +135,12 @@ async def clean_download(opath):
 
 async def clean_all():
     LOGGER.info("Cleaning Download Directory")
-    await (await create_subprocess_exec("rm", "-rf", DOWNLOAD_DIR)).wait()
+
+    if await aiopath.exists(DOWNLOAD_DIR):
+        await to_thread(shutil.rmtree, DOWNLOAD_DIR, True)
+
     await aiomakedirs(DOWNLOAD_DIR, exist_ok=True)
+
 
 
 async def clean_unwanted(opath):

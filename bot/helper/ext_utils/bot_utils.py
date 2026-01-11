@@ -52,7 +52,7 @@ def _build_command_usage(help_dict, command_key):
         buttons.data_button("Next", f"help nex {command_key} {i + 1}")
         buttons.data_button("Close", "help close", "footer")
         temp_store.append(buttons.build_menu(2))
-    COMMAND_USAGE[command_key] = [help_dict["main"], *temp_store]
+    COMMAND_USAGE[command_key] = [help_dict["main", ""], *temp_store]
     buttons.reset()
 
 
@@ -74,7 +74,8 @@ def _build_command_usage(help_dict, command_key):
         temp_store.append(buttons.build_menu(2))
         buttons.reset()
 
-    COMMAND_USAGE[command_key] = [help_dict["main"], *temp_store]
+    COMMAND_USAGE[command_key] = [help_dict.get("main", ""), *temp_store]
+
 
 
 def create_help_buttons():
@@ -162,8 +163,6 @@ def arg_parser(items, arg_base):
     if Config.DISABLE_MULTI and "-i" in items:
         arg_base["-i"] = 0
 
-    if Config.DISABLE_SEED and "-d" in items:
-        arg_base["-d"] = False
 
     while i < total:
         part = items[i]

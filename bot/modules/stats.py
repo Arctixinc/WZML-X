@@ -39,14 +39,7 @@ from ..helper.telegram_helper.message_utils import (
 from ..version import get_version
 
 commands = {
-    "aria2": ([BinConfig.ARIA2_NAME, "--version"], r"aria2 version ([\d.]+)"),
-    "qBittorrent": ([BinConfig.QBIT_NAME, "--version"], r"qBittorrent v([\d.]+)"),
-    "SABnzbd+": (
-        [BinConfig.SABNZBD_NAME, "--version"],
-        rf"{BinConfig.SABNZBD_NAME}-([\d.]+)",
-    ),
     "python": (["python3", "--version"], r"Python ([\d.]+)"),
-    "rclone": ([BinConfig.RCLONE_NAME, "--version"], r"rclone v([\d.]+)"),
     "yt-dlp": (["yt-dlp", "--version"], r"([\d.]+)"),
     "ffmpeg": (
         [BinConfig.FFMPEG_NAME, "-version"],
@@ -55,8 +48,6 @@ commands = {
     "7z": (["7z", "i"], r"7-Zip ([\d.]+)"),
     "aiohttp": (["uv", "pip", "show", "aiohttp"], r"Version: ([\d.]+)"),
     "pyrotgfork": (["uv", "pip", "show", "pyrotgfork"], r"Version: ([\d.]+)"),
-    "gapi": (["uv", "pip", "show", "google-api-python-client"], r"Version: ([\d.]+)"),
-    "mega": (["mega-version"], r"version: ([\d.]+)"),
 }
 
 
@@ -150,17 +141,11 @@ async def get_stats(event, key="home"):
         msg = f"""⌬ <b><i>Packages Statistics :</i></b>
 │
 ┟ <b>python:</b> {ver.get("python", "N/A")}
-┠ <b>aria2:</b> {ver.get("aria2", "N/A")}
-┠ <b>qBittorrent:</b> {ver.get("qBittorrent", "N/A")}
-┠ <b>SABnzbd+:</b> {ver.get("SABnzbd+", "N/A")}
-┠ <b>rclone:</b> {ver.get("rclone", "N/A")}
 ┠ <b>yt-dlp:</b> {ver.get("yt-dlp", "N/A")}
 ┠ <b>ffmpeg:</b> {ver.get("ffmpeg", "N/A")}
 ┠ <b>7z:</b> {ver.get("7z", "N/A")}
 ┠ <b>Aiohttp:</b> {ver.get("aiohttp", "N/A")}
-┠ <b>PyroTgFork:</b> {ver.get("pyrotgfork", "N/A")}
-┠ <b>Google API:</b> {ver.get("gapi", "N/A")}
-┖ <b>Mega CMD:</b> {ver.get("mega", "N/A")}
+┖ <b>PyroTgFork:</b> {ver.get("pyrotgfork", "N/A")}
 """
     elif key == "tlimits":
         msg = f"""⌬ <b><i>Bot Task Limits :</i></b>
@@ -323,10 +308,4 @@ async def get_packages_version():
     else:
         last_commit = "No UPSTREAM_REPO"
     bot_cache["commit"] = last_commit
-
-    if bot_cache["eng_versions"]["mega"] in ["Timeout", "N/A"] or bot_cache[
-        "eng_versions"
-    ]["mega"].startswith("Exception"):
-        bot_loop.create_task(retry_mega_version())
-
     LOGGER.info("Fetched Package Versions!")

@@ -20,6 +20,7 @@ class Config:
     EQUAL_SPLITS = False
     EXCLUDED_EXTENSIONS = ""
     FFMPEG_CMDS = {}
+    HELPER_TOKENS = ""
     MEDIA_STORE = True
     AUTHOR_NAME = "WZML-X"
     AUTHOR_URL = "https://t.me/WZML_X"
@@ -50,6 +51,7 @@ class Config:
     RSS_CHAT = ""
     RSS_DELAY = 600
     RSS_SIZE_LIMIT = 0
+    RCLONE_FLAGS = ""
     SET_COMMANDS = True
     STATUS_LIMIT = 10
     STATUS_UPDATE_INTERVAL = 15
@@ -179,4 +181,4 @@ class Config:
 
 
 class BinConfig:
-    FFMPEG_NAME = "mediaforge"
+    FFMPEG_NAME = "ffmpeg"

@@ -18,7 +18,6 @@ async def main():
     from asyncio import gather
 
     from .core.startup import (
-        load_configurations,
         load_settings,
         save_settings,
         update_variables,
@@ -44,7 +43,7 @@ async def main():
     await gather(
         TgClient.start_bot(), TgClient.start_user(), TgClient.start_helper_bots()
     )
-    await gather(load_configurations(), update_variables())
+    await gather(update_variables())
 
     from .helper.ext_utils.files_utils import clean_all
     from .helper.ext_utils.telegraph_helper import telegraph

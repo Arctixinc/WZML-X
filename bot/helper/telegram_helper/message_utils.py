@@ -31,6 +31,10 @@ from ..ext_utils.status_utils import get_readable_message
 
 async def send_message(message, text, buttons=None, block=True, photo=None, **kwargs):
     try:
+        # Convert string message to int if it's a numeric string
+        if isinstance(message, str) and message.lstrip('-').isdigit():
+            message = int(message)
+        
         if photo:
             try:
                 if isinstance(message, int):

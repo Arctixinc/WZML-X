@@ -20,12 +20,12 @@ psutil
 pycountry
 pymongo
 pyrotgfork
-python-magic
+python-magic-bin
 pytz
 requests
 tenacity
 tgcrypto
 urllib3
 uvicorn
-xattr
 yt-dlp[default,curl-cffi]
+telegraph
