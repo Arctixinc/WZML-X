@@ -1,9 +1,5 @@
 # ruff: noqa: E402
 
-from uvloop import install
-
-install()
-
 from subprocess import run as srun
 from os import getcwd
 from asyncio import Lock, new_event_loop, set_event_loop
@@ -22,7 +18,6 @@ from time import time
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from .core.config_manager import BinConfig
-from sabnzbdapi import SabnzbdClient
 
 getLogger("requests").setLevel(WARNING)
 getLogger("urllib3").setLevel(WARNING)
@@ -79,7 +74,7 @@ var_list = [
     "UPDATE_PKGS",
 ]
 auth_chats = {}
-excluded_extensions = ["aria2", "!qB"]
+excluded_extensions = []
 drives_names = []
 drives_ids = []
 index_urls = []
@@ -94,12 +89,5 @@ nzb_listener_lock = Lock()
 jd_listener_lock = Lock()
 cpu_eater_lock = Lock()
 same_directory_lock = Lock()
-
-sabnzbd_client = SabnzbdClient(
-    host="http://localhost",
-    api_key="admin",
-    port="8070",
-)
-srun([BinConfig.QBIT_NAME, "-d", f"--profile={getcwd()}"], check=False)
 
 scheduler = AsyncIOScheduler(event_loop=bot_loop)

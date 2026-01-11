@@ -12,50 +12,15 @@ from ... import (
     user_data,
 )
 from ...core.config_manager import Config
-from ..mirror_leech_utils.gdrive_utils.search import GoogleDriveSearch
 from ..telegram_helper.filters import CustomFilters
 from ..telegram_helper.tg_utils import check_botpm, forcesub, verify_token
-from .bot_utils import get_telegraph_list, sync_to_async, safe_int
-from .files_utils import get_base_name, check_storage_threshold
-from .links_utils import is_gdrive_id
+from .bot_utils import safe_int
+from .files_utils import check_storage_threshold
 from .status_utils import get_readable_time, get_readable_file_size, get_specific_tasks
 
 
 async def stop_duplicate_check(listener):
-    if (
-        isinstance(listener.up_dest, int)
-        or listener.is_leech
-        or listener.select
-        or not is_gdrive_id(listener.up_dest)
-        or (listener.up_dest.startswith("mtp:") and listener.stop_duplicate)
-        or not listener.stop_duplicate
-        or listener.same_dir
-    ):
-        return False, None
-
-    name = listener.name
-    LOGGER.info(f"Checking File/Folder if already in Drive: {name}")
-
-    if listener.compress:
-        name = f"{name}.zip"
-    elif listener.extract:
-        try:
-            name = get_base_name(name)
-        except Exception:
-            name = None
-
-    if name is not None:
-        telegraph_content, contents_no = await sync_to_async(
-            GoogleDriveSearch(stop_dup=True, no_multi=listener.is_clone).drive_list,
-            name,
-            listener.up_dest,
-            listener.user_id,
-        )
-        if telegraph_content:
-            msg = f"File/Folder is already available in Drive.\nHere are {contents_no} list results:"
-            button = await get_telegraph_list(telegraph_content)
-            return msg, button
-
+    # Removed Google Drive specific logic
     return False, None
 
 
@@ -194,16 +159,8 @@ async def limit_checker(listener, yt_playlist=0):
         return limit_exceeded
 
     limits = [
-        (listener.is_torrent or listener.is_qbit, "TORRENT_LIMIT", "Torrent"),
-        (listener.is_mega, "MEGA_LIMIT", "Mega"),
-        (listener.is_gdrive, "GD_DL_LIMIT", "GDriveDL"),
-        (listener.is_clone, "CLONE_LIMIT", "Clone"),
-        (listener.is_jd, "JD_LIMIT", "JDownloader"),
-        (listener.is_nzb, "NZB_LIMIT", "SABnzbd"),
-        (listener.is_rclone, "RC_DL_LIMIT", "RCloneDL"),
         (listener.is_ytdlp, "YTDLP_LIMIT", "YT-DLP"),
         (bool(yt_playlist), "PLAYLIST_LIMIT", "Playlist"),
-        (True, "DIRECT_LIMIT", "Direct"),
     ]
     limit_exceeded = await recurr_limits(limits)
 
@@ -224,13 +181,6 @@ async def limit_checker(listener, yt_playlist=0):
 
     if limit_exceeded:
         return limit_exceeded + f"\n┖ <b>Task By</b> → {listener.tag}"
-
-
-"""
-class UsageChecks: # TODO: Dynamic Check for All Task
-
-class DailyUsageChecks:
-"""
 
 
 async def user_interval_check(user_id):

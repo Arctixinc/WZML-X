@@ -2,7 +2,6 @@ from asyncio import Event, wait_for
 from functools import partial
 from time import time
 
-from httpx import AsyncClient
 from aiofiles.os import path as aiopath
 from yt_dlp import YoutubeDL
 from pyrogram.filters import regex, user
@@ -243,26 +242,12 @@ def extract_info(link, options):
         return result
 
 
-async def _mdisk(link, name):
-    key = link.split("/")[-1]
-    async with AsyncClient(verify=False) as client:
-        resp = await client.get(
-            f"https://diskuploader.entertainvideo.com/v1/file/cdnurl?param={key}"
-        )
-    if resp.status_code == 200:
-        resp_json = resp.json()
-        link = resp_json["source"]
-        if not name:
-            name = resp_json["filename"]
-    return name, link
-
-
 class YtDlp(TaskListener):
     def __init__(
         self,
         client,
         message,
-        is_leech=False,
+        is_leech=True,
         same_dir=None,
         bulk=None,
         multi_tag=None,
@@ -281,7 +266,7 @@ class YtDlp(TaskListener):
         self.bulk = bulk
         super().__init__()
         self.is_ytdlp = True
-        self.is_leech = is_leech
+        self.is_leech = True
 
     async def new_event(self):
         text = self.message.text.split("\n")
@@ -451,9 +436,6 @@ class YtDlp(TaskListener):
             await delete_links(self.message)
             return
 
-        if "mdisk.me" in self.link:
-            self.name, self.link = await _mdisk(self.link, self.name)
-
         try:
             await self.before_start()
         except Exception as e:
@@ -514,7 +496,7 @@ class YtDlp(TaskListener):
 
 
 async def ytdl(client, message):
-    bot_loop.create_task(YtDlp(client, message).new_event())
+    bot_loop.create_task(YtDlp(client, message, is_leech=True).new_event())
 
 
 async def ytdl_leech(client, message):
