@@ -1,9 +1,5 @@
 # ruff: noqa: E402
 
-from uvloop import install
-
-install()
-
 from os import getcwd
 from asyncio import Lock, new_event_loop, set_event_loop
 from logging import (
