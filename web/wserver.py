@@ -1,7 +1,5 @@
 # ruff: noqa: E402
-from uvloop import install
 
-install()
 
 from asyncio import sleep
 from urllib.parse import urlparse
