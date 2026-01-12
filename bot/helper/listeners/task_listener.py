@@ -25,7 +25,6 @@ from ...modules.metadata import apply_metadata_title
 from ..common import TaskConfig
 from ...core.tg_client import TgClient
 from ...core.config_manager import Config
-from ...core.torrent_manager import TorrentManager
 from ..ext_utils.bot_utils import sync_to_async
 from ..ext_utils.links_utils import encode_slink
 from ..ext_utils.db_handler import database
@@ -80,7 +79,7 @@ class TaskListener(TaskConfig):
                 for intvl in list(st.values()):
                     intvl.cancel()
             intervals["status"].clear()
-            await gather(TorrentManager.aria2.purgeDownloadResult(), delete_status())
+            await delete_status()
 
     def clear(self):
         self.subname = ""
